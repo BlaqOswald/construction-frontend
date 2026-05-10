@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -12,12 +15,15 @@ export default function Login() {
         password,
       });
 
+      // store auth data
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.user.role);
 
       console.log("LOGIN SUCCESS:", res.data);
 
-      window.location.href = "/dashboard";
+      // redirect without page reload
+      navigate("/dashboard");
+
     } catch (err) {
       console.error(err);
       alert("Login failed");
@@ -32,6 +38,7 @@ export default function Login() {
         <input
           className="border p-2 w-full mb-2"
           placeholder="Email"
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -39,6 +46,7 @@ export default function Login() {
           className="border p-2 w-full mb-2"
           type="password"
           placeholder="Password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
 
