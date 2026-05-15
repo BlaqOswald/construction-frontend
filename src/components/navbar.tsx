@@ -1,28 +1,117 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 
-export default function Navbar() {
+export default function Navbar({ onMenuClick }: any) {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
+  const role = user?.role;
+
   return (
     <div className="h-[60px] bg-white flex items-center justify-between px-6 border-b shadow-sm">
-      {/* Left */}
-      <h1 className="font-bold text-lg">Construction ERP</h1>
 
-      {/* Right */}
-      <div className="flex items-center gap-4">
-        <span className="text-gray-600">👤 User</span>
-
-        <button
-          onClick={logout}
-          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-        >
-          Logout
+      {/* LEFT SIDE */}
+      <div className="flex items-center gap-3">
+        <button onClick={onMenuClick} className="text-2xl">
+          ☰
         </button>
+
+        <h1 className="font-bold text-lg">
+          Construction ERP
+        </h1>
+      </div>
+
+      {/* RIGHT SIDE */}
+      <div className="flex items-center gap-4 relative">
+
+        {/* USER DROPDOWN */}
+        <div className="relative">
+          <button
+            onClick={() => setOpen(!open)}
+            className="text-gray-700 font-medium"
+          >
+            👤 {user?.name || "User"}
+          </button>
+
+          {open && (
+            <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow-md z-50">
+
+              {/* ADMIN ONLY */}
+              {role === "admin" && (
+                <Link
+                  to="/users"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setOpen(false)}
+                >
+                  User Management
+                </Link>
+              )}
+
+              {/* ADMIN + MANAGER */}
+              {(role === "admin" || role === "manager") && (
+                <Link
+                  to="/projects"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setOpen(false)}
+                >
+                  Projects
+                </Link>
+              )}
+
+              {/* MANAGER ONLY */}
+              {role === "manager" && (
+                <>
+                  <Link
+                    to="/tasks"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    Tasks
+                  </Link>
+
+                  <Link
+                    to="/materials"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    onClick={() => setOpen(false)}
+                  >
+                    Materials
+                  </Link>
+                </>
+              )}
+
+              {/* CLIENT */}
+              {role === "client" && (
+                <Link
+                  to="/projects"
+                  className="block px-4 py-2 hover:bg-gray-100"
+                  onClick={() => setOpen(false)}
+                >
+                  My Projects
+                </Link>
+              )}
+
+              <hr />
+
+              {/* LOGOUT */}
+              <button
+                onClick={logout}
+                className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+              >
+                Logout
+              </button>
+
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

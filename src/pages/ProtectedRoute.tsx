@@ -1,12 +1,40 @@
 import { Navigate } from "react-router-dom";
-const ProtectedRoute = ({ children }: any) => {
-  const token = localStorage.getItem("token");
 
-  if (!token) {
+export default function ProtectedRoute({
+  children,
+  allowedRoles,
+}: {
+  children: any;
+  allowedRoles: string[];
+}) {
+  const token = localStorage.getItem("token");
+  const userRaw = localStorage.getItem("user");
+
+  // No login at all
+  if (!token || !userRaw) {
     return <Navigate to="/login" />;
   }
 
-  return children;
-};
+  let user;
 
-export default ProtectedRoute;
+  try {
+    user = JSON.parse(userRaw);
+  } catch (err) {
+    // corrupted localStorage fallback
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    return <Navigate to="/login" />;
+  }
+
+  // No role found
+  if (!user?.role) {
+    return <Navigate to="/login" />;
+  }
+
+  // Role not allowed
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" />;
+  }
+
+  return children;
+}

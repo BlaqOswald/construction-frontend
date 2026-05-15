@@ -182,3 +182,7 @@
     border-right-color: var(--border);
   }
 }
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+}

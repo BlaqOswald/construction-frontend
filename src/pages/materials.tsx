@@ -20,6 +20,7 @@ const Materials = () => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [search, setSearch] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState<Material>({
     name: "",
@@ -31,15 +32,15 @@ const Materials = () => {
     date_received: "",
   });
 
-  // =========================
-  // FETCH MATERIALS
-  // =========================
   const fetchMaterials = async () => {
     try {
+      setLoading(true);
       const res = await API.get(`/materials/project/${projectId}`);
       setMaterials(res.data || []);
     } catch (err) {
-      console.error("FETCH ERROR:", err);
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -47,19 +48,13 @@ const Materials = () => {
     if (projectId) fetchMaterials();
   }, [projectId]);
 
-  // =========================
-  // HANDLE INPUT
-  // =========================
   const handleChange = (e: any) => {
     const { name, value } = e.target;
 
     const updated: any = {
       ...form,
       [name]:
-        name === "name" ||
-        name === "description" ||
-        name === "currency" ||
-        name === "date_received"
+        ["name", "description", "currency", "date_received"].includes(name)
           ? value
           : Number(value),
     };
@@ -70,9 +65,6 @@ const Materials = () => {
     setForm(updated);
   };
 
-  // =========================
-  // RESET FORM
-  // =========================
   const resetForm = () => {
     setForm({
       name: "",
@@ -86,138 +78,129 @@ const Materials = () => {
     setEditingId(null);
   };
 
-  // =========================
-  // SAVE (CREATE / UPDATE)
-  // =========================
   const saveMaterial = async () => {
     try {
-      if (!projectId) return;
+      const payload = {
+        project_id: projectId,
+        ...form,
+        total_cost: Number(form.unit_cost) * Number(form.quantity_used),
+      };
 
       if (editingId) {
-        await API.put(`/materials/${editingId}`, form);
+        await API.put(`/materials/${editingId}`, payload);
       } else {
-        await API.post("/materials", {
-          ...form,
-          project_id: projectId,
-        });
+        await API.post("/materials", payload);
       }
 
       await fetchMaterials();
       resetForm();
     } catch (err) {
-      console.error("SAVE ERROR:", err);
+      console.error(err);
     }
   };
 
-  // =========================
-  // DELETE
-  // =========================
-  const deleteMaterial = async (id: string) => {
-    try {
-      if (!window.confirm("Are you sure you want to delete this material?"))
-        return;
+  const deleteMaterial = async (id?: string) => {
+    if (!id) return;
+    if (!window.confirm("Delete this material?")) return;
 
-      await API.delete(`/materials/${id}`);
-      await fetchMaterials();
-    } catch (err) {
-      console.error("DELETE ERROR:", err);
-    }
+    await API.delete(`/materials/${id}`);
+    fetchMaterials();
   };
 
-  // =========================
-  // EDIT
-  // =========================
   const editMaterial = (m: Material) => {
     setForm({
-      name: m.name || "",
-      description: m.description || "",
-      unit_cost: m.unit_cost || 0,
-      quantity_used: m.quantity_used || 0,
-      total_cost: m.total_cost || 0,
-      currency: m.currency || "UGX",
-      date_received: m.date_received || "",
+      ...m,
+      date_received: m.date_received?.split("T")[0] || "",
     });
-
     setEditingId(m.id || null);
   };
 
-  // =========================
-  // SEARCH FILTER
-  // =========================
   const filtered = materials.filter((m) =>
-    (m.name || "").toLowerCase().includes(search.toLowerCase())
+    m.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <MainLayout>
-      <div className="p-6">
+      <div className="p-6 space-y-5">
 
-        <h1 className="text-2xl font-bold mb-6">
-          Materials Management
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800">Materials</h1>
 
         {/* FORM */}
-        <div className="bg-white p-4 shadow rounded grid grid-cols-3 gap-3">
+        <div className="bg-white p-5 shadow-md rounded-lg border grid grid-cols-3 gap-4">
 
-          <input
-            name="name"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm text-gray-600">Material Name</label>
+            <input
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            />
+          </div>
 
-          <input
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm text-gray-600">Description</label>
+            <input
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            />
+          </div>
 
-          <input
-            type="date"
-            name="date_received"
-            value={form.date_received}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm text-gray-600">Date Received</label>
+            <input
+              type="date"
+              name="date_received"
+              value={form.date_received}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            />
+          </div>
 
-          <input
-            type="number"
-            name="unit_cost"
-            placeholder="Unit Cost"
-            value={form.unit_cost}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm text-gray-600">Unit Cost</label>
+            <input
+              type="number"
+              name="unit_cost"
+              value={form.unit_cost}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            />
+          </div>
 
-          <input
-            type="number"
-            name="quantity_used"
-            placeholder="Quantity"
-            value={form.quantity_used}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
+          <div>
+            <label className="text-sm text-gray-600">Quantity Used</label>
+            <input
+              type="number"
+              name="quantity_used"
+              value={form.quantity_used}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            />
+          </div>
 
-          <select
-            name="currency"
-            value={form.currency}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          >
-            <option value="UGX">UGX</option>
-            <option value="USD">USD</option>
-          </select>
+          <div>
+            <label className="text-sm text-gray-600">Currency</label>
+            <select
+              name="currency"
+              value={form.currency}
+              onChange={handleChange}
+              className="border p-2 rounded w-full mt-1"
+            >
+              <option value="UGX">UGX</option>
+              <option value="USD">USD</option>
+            </select>
+          </div>
 
           <button
             onClick={saveMaterial}
-            className="col-span-3 bg-blue-600 text-white p-2 rounded"
+            disabled={!form.name}
+            className="col-span-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded font-medium"
           >
             {editingId ? "Update Material" : "Add Material"}
           </button>
-
         </div>
 
         {/* SEARCH */}
@@ -225,65 +208,69 @@ const Materials = () => {
           placeholder="Search materials..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 rounded mt-4 w-full"
+          className="border p-3 rounded w-full shadow-sm"
         />
 
         {/* TABLE */}
-        <div className="mt-4 bg-white shadow rounded overflow-hidden">
-
-          <table className="w-full text-left border">
-
-            <thead className="bg-gray-100">
+        <div className="bg-white shadow-md rounded-lg overflow-hidden border">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-100 text-gray-700">
               <tr>
-                <th className="border p-2">Name</th>
-                <th className="border p-2">Qty</th>
-                <th className="border p-2">Total</th>
-                <th className="border p-2">Actions</th>
+                <th className="p-3 text-left">Name</th>
+                <th>Description</th>
+                <th>Date Received</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {filtered.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan={4} className="text-center p-4">
-                    No materials found
+                  <td colSpan={6} className="p-6 text-center">
+                    Loading...
                   </td>
                 </tr>
               ) : (
-                filtered.map((m) => (
-                  <tr key={m.id} className="border-t hover:bg-gray-50">
-
-                    <td className="p-2">{m.name}</td>
-                    <td className="p-2">{m.quantity_used}</td>
-                    <td className="p-2">{m.total_cost}</td>
-
-                    <td className="p-2 flex gap-2">
-
+                filtered.map((m, index) => (
+                  <tr
+                    key={m.id}
+                    className={`border-t hover:bg-gray-50 ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    }`}
+                  >
+                    <td className="p-3">{m.name}</td>
+                    <td>{m.description || "-"}</td>
+                    <td>
+                      {m.date_received
+                        ? new Date(m.date_received).toLocaleDateString()
+                        : "-"}
+                    </td>
+                    <td>{m.quantity_used}</td>
+                    <td>
+                      {m.currency} {Number(m.total_cost).toLocaleString()}
+                    </td>
+                    <td>
                       <button
                         onClick={() => editMaterial(m)}
-                        className="bg-yellow-500 text-white px-2 py-1 rounded"
+                        className="text-blue-600 mr-3 font-medium"
                       >
                         Edit
                       </button>
-
                       <button
-                        onClick={() => deleteMaterial(m.id!)}
-                        className="bg-red-600 text-white px-2 py-1 rounded"
+                        onClick={() => deleteMaterial(m.id)}
+                        className="text-red-600 font-medium"
                       >
                         Delete
                       </button>
-
                     </td>
-
                   </tr>
                 ))
               )}
             </tbody>
-
           </table>
-
         </div>
-
       </div>
     </MainLayout>
   );

@@ -1,16 +1,13 @@
 export default function StatCard({ title, value, color }: any) {
   return (
     <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "12px",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-        borderLeft: `5px solid ${color}`,
-      }}
+      className="bg-white p-5 rounded-xl shadow-sm border-l-4 hover:shadow-md transition"
+      style={{ borderColor: color }}
     >
-      <h4 style={{ color: "#666" }}>{title}</h4>
-      <h2 style={{ fontSize: "28px", marginTop: "10px" }}>{value}</h2>
+      <h4 className="text-gray-500 text-sm">{title}</h4>
+      <h2 className="text-2xl font-bold mt-2 text-gray-800">
+        {value}
+      </h2>
     </div>
   );
 }

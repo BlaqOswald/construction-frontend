@@ -10,40 +10,49 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const res = await API.post("/auth/login", {
+      const response = await API.post("/auth/login", {
         email,
         password,
       });
 
-      // store auth data
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.user.role);
+      // FIRST TIME LOGIN (TEMP PASSWORD FLOW)
+      if (response.data.requiresPasswordChange) {
+        localStorage.setItem("tempEmail", response.data.email);
+        navigate("/set-password");
+        return;
+      }
 
-      console.log("LOGIN SUCCESS:", res.data);
+      // NORMAL LOGIN
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      localStorage.setItem("role", response.data.user.role);
 
-      // redirect without page reload
+      console.log("LOGIN SUCCESS:", response.data);
+
       navigate("/dashboard");
-
-    } catch (err) {
-      console.error(err);
-      alert("Login failed");
+    } catch (err: any) {
+      console.error("LOGIN ERROR:", err.response?.data);
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="p-6 shadow-lg rounded w-80">
-        <h1 className="text-xl mb-4">Login</h1>
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <div className="p-6 shadow-lg rounded w-80 bg-white">
+
+        <h1 className="text-xl font-bold mb-4 text-center">
+          Login
+        </h1>
 
         <input
-          className="border p-2 w-full mb-2"
+          className="border p-2 w-full mb-3 rounded"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <input
-          className="border p-2 w-full mb-2"
+          className="border p-2 w-full mb-3 rounded"
           type="password"
           placeholder="Password"
           value={password}
@@ -51,11 +60,12 @@ export default function Login() {
         />
 
         <button
-          className="bg-blue-600 text-white w-full p-2"
+          className="bg-blue-600 text-white w-full p-2 rounded hover:bg-blue-700"
           onClick={handleLogin}
         >
           Login
         </button>
+
       </div>
     </div>
   );
