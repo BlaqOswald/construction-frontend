@@ -3,12 +3,30 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 import MainLayout from "../layouts/MainLayout";
 
+/**
+ * ✅ Proper Project type (replaces all `any`)
+ */
+type Project = {
+  id: string;
+  name: string;
+  type: string;
+  location: string;
+  locked?: boolean;
+  created_at?: string;
+};
+
+type ProjectForm = {
+  name: string;
+  type: string;
+  location: string;
+};
+
 const Projects = () => {
-  const [projects, setProjects] = useState<any[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ProjectForm>({
     name: "",
     type: "",
     location: "",
@@ -16,12 +34,15 @@ const Projects = () => {
 
   const navigate = useNavigate();
 
+  /**
+   * FETCH PROJECTS
+   */
   const fetchProjects = async () => {
     try {
-      const res = await API.get("/projects");
+      const res = await API.get<Project[]>("/projects");
       setProjects(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("FETCH ERROR:", err);
     }
   };
 
@@ -29,66 +50,82 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
+  /**
+   * CREATE / UPDATE PROJECT
+   */
   const saveProject = async () => {
-  try {
-    let res;
+    try {
+      let res: { data: Project };
 
-    if (editingId) {
-      res = await API.put(`/projects/${editingId}`, form);
+      if (editingId) {
+        res = await API.put<Project>(
+          `/projects/${editingId}`,
+          form
+        );
 
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === editingId ? res.data : p
-        )
-      );
-    } else {
-      res = await API.post("/projects", form);
+        setProjects((prev) =>
+          prev.map((p) =>
+            p.id === editingId ? res.data : p
+          )
+        );
+      } else {
+        res = await API.post<Project>("/projects", form);
 
-      setProjects((prev) => [res.data, ...prev]);
+        setProjects((prev) => [res.data, ...prev]);
+      }
+
+      setForm({
+        name: "",
+        type: "",
+        location: "",
+      });
+
+      setEditingId(null);
+      setOpenMenu(null);
+    } catch (err) {
+      console.error("SAVE ERROR:", err);
     }
+  };
 
+  /**
+   * EDIT PROJECT
+   */
+  const editProject = (project: Project) => {
     setForm({
-      name: "",
-      type: "",
-      location: "",
+      name: project.name,
+      type: project.type,
+      location: project.location,
     });
 
-    setEditingId(null);
+    setEditingId(project.id);
     setOpenMenu(null);
-  } catch (err) {
-    console.error("SAVE ERROR:", err);
-  }
-};
+  };
 
-  const editProject = (project: any) => {
-  setForm({
-    name: project.name,
-    type: project.type,
-    location: project.location,
-  });
-
-  setEditingId(project.id);
-  setOpenMenu(null);
-};
-
+  /**
+   * DELETE PROJECT
+   */
   const deleteProject = async (id: string) => {
-  try {
-    if (!window.confirm("Delete this project?")) return;
+    try {
+      if (!window.confirm("Delete this project?")) return;
 
-    await API.delete(`/projects/${id}`);
+      await API.delete(`/projects/${id}`);
 
-    setProjects((prev) => prev.filter((p) => p.id !== id));
+      setProjects((prev) =>
+        prev.filter((p) => p.id !== id)
+      );
 
-    setOpenMenu(null);
-  } catch (err) {
-    console.error("DELETE ERROR:", err);
-  }
-};
+      setOpenMenu(null);
+    } catch (err) {
+      console.error("DELETE ERROR:", err);
+    }
+  };
 
   return (
     <MainLayout>
       <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6">Projects</h2>
+        <h2 className="text-2xl font-bold mb-6">
+          Projects
+        </h2>
 
         {/* FORM */}
         <div className="bg-white p-4 shadow rounded grid grid-cols-3 gap-3 mb-6">
@@ -114,7 +151,10 @@ const Projects = () => {
             placeholder="Location"
             value={form.location}
             onChange={(e) =>
-              setForm({ ...form, location: e.target.value })
+              setForm({
+                ...form,
+                location: e.target.value,
+              })
             }
             className="border p-2 rounded"
           />
@@ -123,7 +163,9 @@ const Projects = () => {
             onClick={saveProject}
             className="col-span-3 bg-blue-600 text-white p-2 rounded"
           >
-            {editingId ? "Update Project" : "Add Project"}
+            {editingId
+              ? "Update Project"
+              : "Add Project"}
           </button>
         </div>
 
@@ -142,20 +184,33 @@ const Projects = () => {
 
           <tbody>
             {projects.map((p) => (
-              <tr key={p.id} className="border-b text-center">
+              <tr
+                key={p.id}
+                className="border-b text-center"
+              >
                 <td>{p.name}</td>
                 <td>{p.type}</td>
                 <td>{p.location}</td>
-                <td>{p.locked ? "Locked 🔒" : "Active ✅"}</td>
                 <td>
-                  {new Date(p.created_at).toLocaleDateString()}
+                  {p.locked
+                    ? "Locked 🔒"
+                    : "Active ✅"}
+                </td>
+                <td>
+                  {p.created_at
+                    ? new Date(
+                        p.created_at
+                      ).toLocaleDateString()
+                    : "-"}
                 </td>
 
                 <td className="relative">
                   <button
                     onClick={() =>
                       setOpenMenu(
-                        openMenu === p.id ? null : p.id
+                        openMenu === p.id
+                          ? null
+                          : p.id
                       )
                     }
                     className="text-xl px-3"
@@ -167,7 +222,9 @@ const Projects = () => {
                     <div className="absolute right-0 mt-2 w-40 bg-white border shadow-lg rounded z-10">
                       <button
                         onClick={() =>
-                          navigate(`/projects/${p.id}/tasks`)
+                          navigate(
+                            `/projects/${p.id}/tasks`
+                          )
                         }
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                       >
@@ -176,7 +233,9 @@ const Projects = () => {
 
                       <button
                         onClick={() =>
-                          navigate(`/projects/${p.id}/reports`)
+                          navigate(
+                            `/projects/${p.id}/reports`
+                          )
                         }
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                       >
@@ -191,7 +250,9 @@ const Projects = () => {
                       </button>
 
                       <button
-                        onClick={() => deleteProject(p.id)}
+                        onClick={() =>
+                          deleteProject(p.id)
+                        }
                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
                       >
                         Delete
