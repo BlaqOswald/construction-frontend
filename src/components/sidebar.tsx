@@ -1,55 +1,69 @@
 import { Link, useLocation } from "react-router-dom";
 
-const Sidebar = ({ open, onClose }: any) => {
+export default function Sidebar({ open, onClose }: any) {
   const location = useLocation();
 
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.role;
+
   const menu = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Projects", path: "/projects" },
-    { name: "Tasks", path: "/projects/tasks" },
-    { name: "Materials", path: "/projects/materials" },
-    { name: "Subcontractors", path: "/projects/subcontractors" },
-    { name: "Reports", path: "/projects/reports" },
+    { name: "Dashboard", path: "/dashboard", roles: ["admin", "manager", "client"] },
+    { name: "Projects", path: "/projects", roles: ["admin", "manager", "client"] },
+    { name: "Tasks", path: "/projects/tasks", roles: ["admin", "manager"] },
+    { name: "Materials", path: "/projects/materials", roles: ["admin", "manager"] },
+    { name: "Subcontractors", path: "/projects/subcontractors", roles: ["admin", "manager"] },
+    { name: "Reports", path: "/projects/reports", roles: ["admin", "manager", "client"] },
+    { name: "Users", path: "/users", roles: ["admin"] },
   ];
 
   return (
     <>
-      {/* OVERLAY */}
+      {/* BACKDROP (mobile only) */}
       {open && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-black bg-opacity-40 z-40"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
         />
       )}
 
       {/* SIDEBAR */}
-      <div
-        className={`fixed z-50 top-0 left-0 h-full w-64 bg-gray-900 text-white p-4 transform transition-transform duration-300
-        ${open ? "translate-x-0" : "-translate-x-full"}`}
+      <aside
+        className={`
+          fixed md:static z-50
+          top-0 left-0 h-full w-64
+          bg-gray-900 text-white
+          transform transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+        `}
       >
-        <h2 className="text-xl font-bold mb-6">
+        <div className="p-4 font-bold text-lg border-b border-gray-700">
           Construction ERP
-        </h2>
+        </div>
 
-        <nav className="space-y-2">
-          {menu.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              onClick={onClose} // ✅ auto close on click
-              className={`block p-2 rounded transition ${
-                location.pathname === item.path
-                  ? "bg-blue-600"
-                  : "hover:bg-gray-700"
-              }`}
-            >
-              {item.name}
-            </Link>
-          ))}
+        <nav className="p-4 flex flex-col gap-2">
+          {menu
+            .filter((item) => item.roles.includes(role))
+            .map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={onClose}
+                className={`
+                  p-2 rounded
+                  transition
+                  ${
+                    location.pathname === item.path
+                      ? "bg-blue-600"
+                      : "hover:bg-gray-700"
+                  }
+                `}
+              >
+                {item.name}
+              </Link>
+            ))}
         </nav>
-      </div>
+      </aside>
     </>
   );
-};
-
-export default Sidebar;
+}

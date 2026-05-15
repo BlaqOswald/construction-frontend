@@ -6,6 +6,7 @@ export default function Navbar({ onMenuClick }: any) {
   const [open, setOpen] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = user?.role;
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -14,14 +15,17 @@ export default function Navbar({ onMenuClick }: any) {
     navigate("/login");
   };
 
-  const role = user?.role;
-
   return (
-    <div className="h-[60px] bg-white flex items-center justify-between px-6 border-b shadow-sm">
+    <div className="h-[60px] bg-white flex items-center justify-between px-4 sm:px-6 border-b shadow-sm">
 
       {/* LEFT SIDE */}
       <div className="flex items-center gap-3">
-        <button onClick={onMenuClick} className="text-2xl">
+
+        {/* MOBILE MENU BUTTON */}
+        <button
+          onClick={onMenuClick}
+          className="text-2xl md:hidden"
+        >
           ☰
         </button>
 
@@ -33,7 +37,7 @@ export default function Navbar({ onMenuClick }: any) {
       {/* RIGHT SIDE */}
       <div className="flex items-center gap-4 relative">
 
-        {/* USER DROPDOWN */}
+        {/* USER BUTTON */}
         <div className="relative">
           <button
             onClick={() => setOpen(!open)}
@@ -42,10 +46,11 @@ export default function Navbar({ onMenuClick }: any) {
             👤 {user?.name || "User"}
           </button>
 
+          {/* DROPDOWN */}
           {open && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border rounded shadow-md z-50">
+            <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-50">
 
-              {/* ADMIN ONLY */}
+              {/* ADMIN */}
               {role === "admin" && (
                 <Link
                   to="/users"
@@ -71,7 +76,7 @@ export default function Navbar({ onMenuClick }: any) {
               {role === "manager" && (
                 <>
                   <Link
-                    to="/tasks"
+                    to="/projects"
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => setOpen(false)}
                   >
@@ -79,7 +84,7 @@ export default function Navbar({ onMenuClick }: any) {
                   </Link>
 
                   <Link
-                    to="/materials"
+                    to="/projects"
                     className="block px-4 py-2 hover:bg-gray-100"
                     onClick={() => setOpen(false)}
                   >
@@ -99,7 +104,7 @@ export default function Navbar({ onMenuClick }: any) {
                 </Link>
               )}
 
-              <hr />
+              <hr className="my-1" />
 
               {/* LOGOUT */}
               <button
