@@ -23,7 +23,6 @@ const Tasks = () => {
     end_date: "",
   });
 
-  // FETCH TASKS
   const fetchTasks = async () => {
     try {
       setLoading(true);
@@ -40,7 +39,6 @@ const Tasks = () => {
     if (projectId) fetchTasks();
   }, [projectId]);
 
-  // HANDLE INPUT
   const handleChange = (e: any) => {
     const { name, value } = e.target;
 
@@ -62,7 +60,6 @@ const Tasks = () => {
     setForm(updated);
   };
 
-  // RESET FORM
   const reset = () => {
     setForm({
       activity: "",
@@ -79,7 +76,6 @@ const Tasks = () => {
     setEditingId(null);
   };
 
-  // SAVE TASK
   const saveTask = async () => {
     try {
       const payload = {
@@ -102,7 +98,6 @@ const Tasks = () => {
     }
   };
 
-  // EDIT TASK
   const editTask = (t: any) => {
     setForm({
       activity: t.activity || "",
@@ -119,11 +114,9 @@ const Tasks = () => {
     setEditingId(t.id);
   };
 
-  // DELETE TASK
   const deleteTask = async (id: string) => {
     try {
       if (!window.confirm("Delete this task?")) return;
-
       await API.delete(`/tasks/${id}`);
       fetchTasks();
     } catch (err) {
@@ -131,10 +124,8 @@ const Tasks = () => {
     }
   };
 
-  // FILTER
   const filteredTasks = tasks.filter((t) => {
     const q = search.toLowerCase();
-
     return (
       t.activity?.toLowerCase().includes(q) ||
       t.description?.toLowerCase().includes(q) ||
@@ -144,116 +135,53 @@ const Tasks = () => {
 
   return (
     <MainLayout>
-      <div className="p-6 space-y-5">
+      <div className="p-3 sm:p-6 space-y-5">
 
-        <h1 className="text-2xl font-bold text-gray-800">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
           Tasks
         </h1>
 
         {/* SEARCH */}
         <input
-          className="border p-3 rounded w-full shadow-sm"
+          className="border p-2 sm:p-3 rounded w-full shadow-sm"
           placeholder="Search tasks..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         {/* FORM */}
-        <div className="bg-white p-5 shadow-md rounded-lg border grid grid-cols-3 gap-4">
+        <div className="bg-white p-4 sm:p-5 shadow-md rounded-lg border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-          <div>
-            <label className="text-sm text-gray-600">
-              Activity
-            </label>
-            <input
-              name="activity"
-              value={form.activity}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
+          {[
+            ["activity", "Activity"],
+            ["description", "Description"],
+            ["start_date", "Start Date"],
+            ["end_date", "End Date"],
+            ["workers_count", "Workers"],
+            ["unit_cost", "Unit Cost"],
+            ["quantity", "Quantity"],
+          ].map(([key, label]) => (
+            <div key={key}>
+              <label className="text-xs text-gray-600">{label}</label>
+              <input
+                name={key}
+                value={(form as any)[key]}
+                onChange={handleChange}
+                type={
+                  key.includes("date")
+                    ? "date"
+                    : key !== "activity" && key !== "description"
+                    ? "number"
+                    : "text"
+                }
+                className="border p-2 rounded w-full mt-1"
+              />
+            </div>
+          ))}
 
+          {/* STATUS */}
           <div>
-            <label className="text-sm text-gray-600">
-              Description
-            </label>
-            <input
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              Start Date
-            </label>
-            <input
-              type="date"
-              name="start_date"
-              value={form.start_date}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              End Date
-            </label>
-            <input
-              type="date"
-              name="end_date"
-              value={form.end_date}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              Workers Count
-            </label>
-            <input
-              type="number"
-              name="workers_count"
-              value={form.workers_count}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              Unit Cost
-            </label>
-            <input
-              type="number"
-              name="unit_cost"
-              value={form.unit_cost}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              Quantity
-            </label>
-            <input
-              type="number"
-              name="quantity"
-              value={form.quantity}
-              onChange={handleChange}
-              className="border p-2 rounded w-full mt-1"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-600">
-              Status
-            </label>
+            <label className="text-xs text-gray-600">Status</label>
             <select
               name="status"
               value={form.status}
@@ -266,34 +194,31 @@ const Tasks = () => {
             </select>
           </div>
 
+          {/* TOTAL */}
           <div>
-            <label className="text-sm text-gray-600">
-              Auto Total Cost
-            </label>
+            <label className="text-xs text-gray-600">Total Cost</label>
             <input
-              value={`UGX ${Number(form.total_cost).toLocaleString()}`}
               disabled
+              value={`UGX ${Number(form.total_cost).toLocaleString()}`}
               className="border p-2 rounded w-full mt-1 bg-gray-100"
             />
           </div>
 
           <button
             onClick={saveTask}
-            disabled={!form.activity}
-            className="col-span-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded font-medium"
+            className="col-span-1 sm:col-span-2 lg:col-span-3 bg-blue-600 text-white p-3 rounded"
           >
             {editingId ? "Update Task" : "Add Task"}
           </button>
         </div>
 
         {/* TABLE */}
-        <div className="bg-white shadow-md rounded-lg overflow-hidden border">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg border">
+          <table className="min-w-[700px] w-full text-sm">
             <thead className="bg-gray-100 text-gray-700">
               <tr>
                 <th className="p-3 text-left">Activity</th>
                 <th>Description</th>
-                <th>Start Date</th>
                 <th>Status</th>
                 <th>Total Cost</th>
                 <th>Actions</th>
@@ -303,86 +228,36 @@ const Tasks = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="p-6 text-center text-gray-500"
-                  >
+                  <td colSpan={5} className="p-6 text-center">
                     Loading tasks...
                   </td>
                 </tr>
-              ) : filteredTasks.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="p-6 text-center text-gray-500"
-                  >
-                    No tasks found
+              ) : filteredTasks.map((t) => (
+                <tr key={t.id} className="border-t">
+                  <td className="p-3 font-medium">{t.activity}</td>
+                  <td>{t.description || "-"}</td>
+                  <td>{t.status}</td>
+                  <td>UGX {Number(t.total_cost).toLocaleString()}</td>
+                  <td>
+                    <button
+                      onClick={() => editTask(t)}
+                      className="text-blue-600 mr-2"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteTask(t.id)}
+                      className="text-red-600"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
-              ) : (
-                filteredTasks.map((t, index) => (
-                  <tr
-                    key={t.id}
-                    className={`border-t hover:bg-gray-50 ${
-                      index % 2 === 0
-                        ? "bg-white"
-                        : "bg-gray-50"
-                    }`}
-                  >
-                    <td className="p-3 font-medium">
-                      {t.activity}
-                    </td>
-
-                    <td>{t.description || "-"}</td>
-
-                    <td>
-                      {t.start_date
-                        ? new Date(
-                            t.start_date
-                          ).toLocaleDateString("en-GB")
-                        : "-"}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium ${
-                          t.status === "completed"
-                            ? "bg-green-100 text-green-700"
-                            : t.status === "in_progress"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {t.status}
-                      </span>
-                    </td>
-
-                    <td className="font-medium text-green-700">
-                      UGX{" "}
-                      {Number(t.total_cost).toLocaleString()}
-                    </td>
-
-                    <td>
-                      <button
-                        onClick={() => editTask(t)}
-                        className="text-blue-600 font-medium mr-3"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => deleteTask(t.id)}
-                        className="text-red-600 font-medium"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         </div>
+
       </div>
     </MainLayout>
   );

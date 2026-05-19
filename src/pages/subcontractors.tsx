@@ -26,7 +26,6 @@ const Subcontractors = () => {
     note: "",
   });
 
-  // FETCH
   const fetchSubs = async () => {
     const res = await API.get(`/subcontractors/project/${projectId}`);
     setSubs(res.data);
@@ -91,188 +90,186 @@ const Subcontractors = () => {
 
   return (
     <MainLayout>
-      <div className="p-6">
+      <div className="p-3 sm:p-6 space-y-4">
 
-        <h1 className="text-2xl font-bold mb-6">Subcontractors</h1>
+        <h1 className="text-xl sm:text-2xl font-bold">
+          Subcontractors
+        </h1>
 
-        {/* ================= FORM (LABELS ADDED ONLY) ================= */}
-        <div className="bg-white p-4 shadow rounded grid grid-cols-3 gap-3">
+        {/* FORM (MOBILE SAFE) */}
+        <div className="bg-white p-4 shadow rounded">
 
-          {/* NAME */}
-          <div>
-            <label className="text-xs text-gray-600">Subcontractor Name</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
-          {/* WORK */}
-          <div>
-            <label className="text-xs text-gray-600">Work Type</label>
-            <input
-              name="task_work"
-              value={form.task_work}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
-          </div>
+            <div>
+              <label className="text-xs text-gray-600">Name</label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
 
-          {/* TOTAL COST */}
-          <div>
-            <label className="text-xs text-gray-600">Total Contract Cost</label>
-            <input
-              type="number"
-              name="total_contract_cost"
-              value={form.total_contract_cost}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
-          </div>
+            <div>
+              <label className="text-xs text-gray-600">Work Type</label>
+              <input
+                name="task_work"
+                value={form.task_work}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
 
-          {/* PAID */}
-          <div>
-            <label className="text-xs text-gray-600">Initial Amount Paid</label>
-            <input
-              type="number"
-              name="amount_paid"
-              value={form.amount_paid}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
-          </div>
+            <div>
+              <label className="text-xs text-gray-600">Total Cost</label>
+              <input
+                type="number"
+                name="total_contract_cost"
+                value={form.total_contract_cost}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
 
-          {/* DATE */}
-          <div>
-            <label className="text-xs text-gray-600">Payment Date</label>
-            <input
-              type="date"
-              name="payment_date"
-              value={form.payment_date}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
-          </div>
+            <div>
+              <label className="text-xs text-gray-600">Paid</label>
+              <input
+                type="number"
+                name="amount_paid"
+                value={form.amount_paid}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
 
-          {/* DESCRIPTION */}
-          <div className="col-span-3">
-            <label className="text-xs text-gray-600">Description</label>
-            <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              className="border p-2 w-full"
-            />
+            <div>
+              <label className="text-xs text-gray-600">Payment Date</label>
+              <input
+                type="date"
+                name="payment_date"
+                value={form.payment_date}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-3">
+              <label className="text-xs text-gray-600">Description</label>
+              <textarea
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                className="border p-2 w-full rounded"
+              />
+            </div>
+
           </div>
 
           <button
             onClick={saveSub}
-            className="col-span-3 bg-green-600 text-white p-2"
+            className="mt-4 w-full bg-green-600 text-white p-2 rounded"
           >
             {editingId ? "Update Subcontractor" : "Add Subcontractor"}
           </button>
 
         </div>
 
-        {/* ================= SEARCH ================= */}
+        {/* SEARCH */}
         <input
-          className="border p-2 mt-4 w-full"
+          className="border p-2 w-full rounded"
           placeholder="Search subcontractor..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* ================= TABLE (UNCHANGED STYLE) ================= */}
-        <table className="w-full mt-4 bg-white shadow border">
+        {/* TABLE WRAPPER (CRITICAL FIX) */}
+        <div className="overflow-x-auto bg-white shadow rounded">
+          <table className="w-full min-w-[800px] text-sm">
 
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="border p-2">Name</th>
-              <th className="border p-2">Work</th>
-              <th className="border p-2">Description</th>
-              <th className="border p-2">Total</th>
-              <th className="border p-2">Paid</th>
-              <th className="border p-2">Balance</th>
-              <th className="border p-2">History</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filtered.map((s) => (
-              <tr key={s.id} className="border-t">
-
-                <td className="p-2">{s.name}</td>
-                <td className="p-2">{s.task_work}</td>
-                <td className="p-2 text-gray-600">{s.description || "—"}</td>
-
-                <td className="p-2">{s.total_contract_cost}</td>
-                <td className="p-2">{s.amount_paid}</td>
-                <td className="p-2 font-bold text-blue-600">{s.balance}</td>
-
-                {/* HISTORY */}
-                <td className="p-2 text-xs">
-                  {Array.isArray(s.payment_history) && s.payment_history.length > 0 ? (
-                    s.payment_history.map((p: any, i: number) => (
-                      <div key={i}>
-                        {p.amount_paid} | {p.payment_date}
-                      </div>
-                    ))
-                  ) : (
-                    <span className="text-gray-400">No payments</span>
-                  )}
-                </td>
-
-                {/* ACTIONS */}
-                <td className="p-2">
-
-                  <button
-                    onClick={() =>
-                      setPayment({
-                        id: s.id,
-                        amount_paid: 0,
-                        payment_date: "",
-                        note: "",
-                      })
-                    }
-                    className="bg-blue-500 text-white px-2 py-1 text-xs mr-1"
-                  >
-                    Pay
-                  </button>
-
-                  <button
-                    onClick={() => editSub(s)}
-                    className="bg-gray-500 text-white px-2 py-1 text-xs mr-1"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    onClick={() => deleteSub(s.id)}
-                    className="bg-red-500 text-white px-2 py-1 text-xs"
-                  >
-                    Delete
-                  </button>
-
-                </td>
-
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2">Name</th>
+                <th>Work</th>
+                <th>Description</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>History</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody>
+              {filtered.map((s) => (
+                <tr key={s.id} className="border-t">
 
-        {/* ================= PAYMENT ================= */}
+                  <td className="p-2">{s.name}</td>
+                  <td className="p-2">{s.task_work}</td>
+                  <td className="p-2">{s.description || "—"}</td>
+                  <td className="p-2">{s.total_contract_cost}</td>
+                  <td className="p-2">{s.amount_paid}</td>
+                  <td className="p-2 font-bold text-blue-600">{s.balance}</td>
+
+                  <td className="p-2 text-xs">
+                    {Array.isArray(s.payment_history) && s.payment_history.length > 0
+                      ? s.payment_history.map((p: any, i: number) => (
+                          <div key={i}>
+                            {p.amount_paid} | {p.payment_date}
+                          </div>
+                        ))
+                      : "No payments"}
+                  </td>
+
+                  <td className="p-2 space-y-1 sm:space-y-0 sm:space-x-1 flex flex-col sm:flex-row">
+
+                    <button
+                      onClick={() =>
+                        setPayment({
+                          id: s.id,
+                          amount_paid: 0,
+                          payment_date: "",
+                          note: "",
+                        })
+                      }
+                      className="bg-blue-500 text-white px-2 py-1 text-xs rounded"
+                    >
+                      Pay
+                    </button>
+
+                    <button
+                      onClick={() => editSub(s)}
+                      className="bg-gray-500 text-white px-2 py-1 text-xs rounded"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => deleteSub(s.id)}
+                      className="bg-red-500 text-white px-2 py-1 text-xs rounded"
+                    >
+                      Delete
+                    </button>
+
+                  </td>
+
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
+        </div>
+
+        {/* PAYMENT */}
         {payment.id && (
-          <div className="mt-6 bg-white p-4 shadow rounded">
+          <div className="bg-white p-4 shadow rounded space-y-2">
 
-            <h2 className="font-bold mb-3">Add Payment</h2>
+            <h2 className="font-bold">Add Payment</h2>
 
             <input
               type="number"
-              placeholder="Amount Paid"
+              className="border p-2 w-full"
+              placeholder="Amount"
               value={payment.amount_paid}
               onChange={(e) =>
                 setPayment({
@@ -280,11 +277,11 @@ const Subcontractors = () => {
                   amount_paid: Number(e.target.value),
                 })
               }
-              className="border p-2 w-full mb-2"
             />
 
             <input
               type="date"
+              className="border p-2 w-full"
               value={payment.payment_date}
               onChange={(e) =>
                 setPayment({
@@ -292,10 +289,10 @@ const Subcontractors = () => {
                   payment_date: e.target.value,
                 })
               }
-              className="border p-2 w-full mb-2"
             />
 
             <textarea
+              className="border p-2 w-full"
               placeholder="Note"
               value={payment.note}
               onChange={(e) =>
@@ -304,12 +301,11 @@ const Subcontractors = () => {
                   note: e.target.value,
                 })
               }
-              className="border p-2 w-full mb-2"
             />
 
             <button
               onClick={submitPayment}
-              className="bg-green-600 text-white px-4 py-2"
+              className="bg-green-600 text-white px-4 py-2 rounded w-full"
             >
               Submit Payment
             </button>
