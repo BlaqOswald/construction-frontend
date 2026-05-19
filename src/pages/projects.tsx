@@ -86,9 +86,7 @@ const Projects = () => {
       if (!window.confirm("Delete this project?")) return;
 
       await API.delete(`/projects/${id}`);
-
       setProjects((prev) => prev.filter((p) => p.id !== id));
-
       setOpenMenu(null);
     } catch (err) {
       console.error("DELETE ERROR:", err);
@@ -104,9 +102,9 @@ const Projects = () => {
           Projects
         </h2>
 
-        {/* FORM (MOBILE SAFE) */}
-        <div className="bg-white p-4 rounded shadow">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* FORM (UNCHANGED STRUCTURE) */}
+        <div className="bg-white p-4 shadow rounded">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 
             <input
               placeholder="Project Name"
@@ -138,18 +136,19 @@ const Projects = () => {
 
           <button
             onClick={saveProject}
-            className="mt-4 w-full bg-blue-600 text-white p-3 rounded"
+            className="mt-3 w-full bg-blue-600 text-white p-2 rounded"
           >
             {editingId ? "Update Project" : "Add Project"}
           </button>
         </div>
 
-        {/* TABLE WRAPPER (CRITICAL FIX) */}
+        {/* TABLE FIX (IMPORTANT PART) */}
         <div className="bg-white shadow rounded overflow-x-auto">
+
           <table className="w-full min-w-[700px] text-sm">
 
             <thead>
-              <tr className="border-b bg-gray-100">
+              <tr className="border-b">
                 <th className="p-3 text-left">Name</th>
                 <th>Type</th>
                 <th>Location</th>
@@ -175,13 +174,10 @@ const Projects = () => {
                       : "-"}
                   </td>
 
-                  {/* MENU */}
                   <td className="relative">
                     <button
                       onClick={() =>
-                        setOpenMenu(
-                          openMenu === p.id ? null : p.id
-                        )
+                        setOpenMenu(openMenu === p.id ? null : p.id)
                       }
                       className="text-xl px-3"
                     >
@@ -192,18 +188,14 @@ const Projects = () => {
                       <div className="absolute right-0 z-50 w-40 bg-white border shadow rounded">
 
                         <button
-                          onClick={() =>
-                            navigate(`/projects/${p.id}/tasks`)
-                          }
+                          onClick={() => navigate(`/projects/${p.id}/tasks`)}
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
                           Tasks
                         </button>
 
                         <button
-                          onClick={() =>
-                            navigate(`/projects/${p.id}/reports`)
-                          }
+                          onClick={() => navigate(`/projects/${p.id}/reports`)}
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
                           Report

@@ -127,57 +127,69 @@ const Materials = () => {
           Materials
         </h1>
 
-        {/* FORM (RESPONSIVE FIX) */}
-        <div className="bg-white p-4 sm:p-5 shadow-md rounded-lg border">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* FORM */}
+        <div className="bg-white p-4 sm:p-5 shadow-md rounded-lg border grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
+          <div>
+            <label className="text-sm text-gray-600">Material Name</label>
             <input
               name="name"
-              placeholder="Material Name"
               value={form.name}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             />
+          </div>
 
+          <div>
+            <label className="text-sm text-gray-600">Description</label>
             <input
               name="description"
-              placeholder="Description"
               value={form.description}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             />
+          </div>
 
+          <div>
+            <label className="text-sm text-gray-600">Date Received</label>
             <input
               type="date"
               name="date_received"
               value={form.date_received}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             />
+          </div>
 
+          <div>
+            <label className="text-sm text-gray-600">Unit Cost</label>
             <input
               type="number"
               name="unit_cost"
-              placeholder="Unit Cost"
               value={form.unit_cost}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             />
+          </div>
 
+          <div>
+            <label className="text-sm text-gray-600">Quantity Used</label>
             <input
               type="number"
               name="quantity_used"
-              placeholder="Quantity"
               value={form.quantity_used}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             />
+          </div>
 
+          <div>
+            <label className="text-sm text-gray-600">Currency</label>
             <select
               name="currency"
               value={form.currency}
               onChange={handleChange}
-              className="border p-2 rounded w-full"
+              className="border p-2 rounded w-full mt-1"
             >
               <option value="UGX">UGX</option>
               <option value="USD">USD</option>
@@ -187,7 +199,7 @@ const Materials = () => {
           <button
             onClick={saveMaterial}
             disabled={!form.name}
-            className="mt-4 w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded font-medium"
+            className="col-span-1 sm:col-span-2 lg:col-span-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white p-3 rounded font-medium"
           >
             {editingId ? "Update Material" : "Add Material"}
           </button>
@@ -201,14 +213,14 @@ const Materials = () => {
           className="border p-3 rounded w-full shadow-sm"
         />
 
-        {/* TABLE (MOBILE SAFE SCROLL) */}
+        {/* TABLE (MOBILE SAFE) */}
         <div className="bg-white shadow-md rounded-lg border overflow-x-auto">
-          <table className="w-full min-w-[700px] text-sm">
+          <table className="min-w-[700px] w-full text-sm">
             <thead className="bg-gray-100 text-gray-700">
               <tr>
                 <th className="p-3 text-left">Name</th>
                 <th>Description</th>
-                <th>Date</th>
+                <th>Date Received</th>
                 <th>Qty</th>
                 <th>Total</th>
                 <th>Actions</th>
@@ -226,7 +238,9 @@ const Materials = () => {
                 filtered.map((m, index) => (
                   <tr
                     key={m.id}
-                    className="border-t hover:bg-gray-50"
+                    className={`border-t ${
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    }`}
                   >
                     <td className="p-3">{m.name}</td>
                     <td>{m.description || "-"}</td>
@@ -239,10 +253,10 @@ const Materials = () => {
                     <td>
                       {m.currency} {Number(m.total_cost).toLocaleString()}
                     </td>
-                    <td className="flex gap-2 p-2">
+                    <td className="whitespace-nowrap">
                       <button
                         onClick={() => editMaterial(m)}
-                        className="text-blue-600 font-medium"
+                        className="text-blue-600 mr-3 font-medium"
                       >
                         Edit
                       </button>
