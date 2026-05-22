@@ -9,9 +9,17 @@ export default function Sidebar({ open, onClose }: any) {
   const menu = [
     { name: "Dashboard", path: "/dashboard", roles: ["admin", "manager", "client"] },
     { name: "Projects", path: "/projects", roles: ["admin", "manager", "client"] },
+
+    // ✅ NEW MODULES (kept same routing style as your system)
+    { name: "Pre-Development", path: "/projects/predevelopment", roles: ["admin", "manager"] },
+
     { name: "Tasks", path: "/projects/tasks", roles: ["admin", "manager"] },
     { name: "Materials", path: "/projects/materials", roles: ["admin", "manager"] },
     { name: "Subcontractors", path: "/projects/subcontractors", roles: ["admin", "manager"] },
+
+    { name: "Suppliers", path: "/projects/suppliers", roles: ["admin", "manager"] },
+    { name: "Site Overheads", path: "/projects/site-overheads", roles: ["admin", "manager"] },
+
     { name: "Reports", path: "/projects/reports", roles: ["admin", "manager", "client"] },
     { name: "Users", path: "/users", roles: ["admin"] },
   ];

@@ -102,6 +102,28 @@ const Dashboard = () => {
                     Subcontractors
                   </button>
 
+                  {/* ✅ NEW BUTTONS ADDED (same logic & style) */}
+                  <button
+                    onClick={() => navigate(`/projects/${p.id}/predevelopment`)}
+                    className="bg-indigo-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Pre-Development
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/projects/${p.id}/suppliers`)}
+                    className="bg-teal-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Suppliers
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/projects/${p.id}/site-overheads`)}
+                    className="bg-pink-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Site Overheads
+                  </button>
+
                   <button
                     onClick={() => navigate(`/projects/${p.id}/reports`)}
                     className="bg-green-600 text-white px-3 py-1 rounded text-sm"

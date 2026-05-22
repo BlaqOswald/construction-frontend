@@ -10,6 +10,10 @@ import Reports from "./pages/reports";
 import Users from "./pages/users";
 import SetPassword from "./pages/set-password";
 
+import PreDevelopment from "./pages/predevelopment";
+import Suppliers from "./pages/suppliers";
+import SiteOverheads from "./pages/siteoverheads";
+
 import ProtectedRoute from "./pages/ProtectedRoute";
 import { ProjectProvider } from "./context/ProjectContext";
 
@@ -36,7 +40,7 @@ function App() {
             }
           />
 
-          {/* DASHBOARD (ALL LOGGED IN USERS) */}
+          {/* DASHBOARD */}
           <Route
             path="/dashboard"
             element={
@@ -80,6 +84,36 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["admin", "manager", "client"]}>
                 <Subcontractors />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ NEW: PREDEVELOPMENT */}
+          <Route
+            path="/projects/:projectId/predevelopment"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "manager", "client"]}>
+                <PreDevelopment />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ NEW: SUPPLIERS */}
+          <Route
+            path="/projects/:projectId/suppliers"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "manager", "client"]}>
+                <Suppliers />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ✅ NEW: SITE OVERHEADS */}
+          <Route
+            path="/projects/:projectId/site-overheads"
+            element={
+              <ProtectedRoute allowedRoles={["admin", "manager", "client"]}>
+                <SiteOverheads />
               </ProtectedRoute>
             }
           />

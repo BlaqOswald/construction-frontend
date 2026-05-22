@@ -195,6 +195,13 @@ const Projects = () => {
                         </button>
 
                         <button
+                         onClick={() => navigate(`/projects/${p.id}/suppliers`)}
+                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                        >
+                         Suppliers
+                        </button>
+
+                        <button
                           onClick={() => navigate(`/projects/${p.id}/reports`)}
                           className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                         >
